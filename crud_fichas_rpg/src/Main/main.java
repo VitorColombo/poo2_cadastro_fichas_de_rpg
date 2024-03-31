@@ -12,6 +12,7 @@ import Model.Raca;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Scanner;
+import utils.Batalha;
 
 public class main {
     
@@ -21,7 +22,6 @@ public class main {
     static PreparedStatement ps = null;
     static Connection conn = null;
     static ConexaoMySQL conexao = new ConexaoMySQL();
-    
     static PersonagemDAO personagemDAO = new PersonagemDAO();
     static ContaDAO contaDAO = new ContaDAO();
     static RacaDAO racaDAO = new RacaDAO();
@@ -29,7 +29,7 @@ public class main {
     static PersonagemRacaDAO personagemRacaDAO = new PersonagemRacaDAO();
     static Conta usuarioLogado;
     static ArrayList<Personagem> listaPersonagens;
-            
+
     public static void main(String[] args) {
         int op = -1;
         String aux;
@@ -106,7 +106,8 @@ public class main {
                         + "\n|4. Inserir personagem                 |"
                         + "\n|5. Procurar personagem                |"
                         + "\n|6. Atualizar personagem               |"
-                        + "\n|7. Deletar personagem                 |");                
+                        + "\n|7. Deletar personagem                 |"
+                        + "\n|8. Batalhar                           |");
                 System.out.println("----------------------------------------");
                 System.out.println("|0. Sair\nEscolha uma opcao -> ");       
                 
@@ -135,6 +136,9 @@ public class main {
                                 System.out.println("id: "+ personagem.getIdPersonagem());
                                 System.out.println("nome: "+ personagem.getNome());
                                 System.out.println("nivel: "+ personagem.getNivel());
+                                System.out.println("vida: "+ personagem.getVida());
+                                System.out.println("força: "+ personagem.getForca());
+                                System.out.println("defesa: "+ personagem.getDefesa());
                                 System.out.println("_______________________");
                             }
                         } else {
@@ -317,7 +321,10 @@ public class main {
                         } else {
                             System.out.println("Senha incorreta. Tente novamente.");
                         }
-                        break;                   
+                        break;
+                    case 8:
+                        menuBatalha();
+                        break;
                     default:
                         System.out.println("Opcao invalida! Tente novamente x.x");
                 }
@@ -347,6 +354,72 @@ public class main {
         } while (!isInputValido);
     return resp;
     }
+    public static void menuBatalha(){
+        Scanner scanner = new Scanner(System.in);
+        int id;
+        System.out.println("Bem vindo ao menu de batalha!");
+        System.out.println("Escolha seu personagem para batalha:");
+        listaPersonagens = contaPersonagemDAO.buscarPersonagemConta(usuarioLogado.getIdConta());
+        if(!listaPersonagens.isEmpty()){
+            for(int i = 0; i < listaPersonagens.size(); i++){
+                Personagem personagem = listaPersonagens.get(i);
+
+                System.out.println("id: "+ personagem.getIdPersonagem());
+                System.out.println("nome: "+ personagem.getNome());
+                System.out.println("nivel: "+ personagem.getNivel());
+                System.out.println("_______________________");
+            }
+        } else {
+            System.out.println("Conta nao tem personagem vinculado :(");
+        }
+        System.out.println("Seu personagem:");
+        System.out.println("Digite o id do personagem:");
+        id = scanner.nextInt();
+        Personagem personagem1 = personagemDAO.read(id);
+        listaPersonagens = personagemDAO.list();
+        for(int i = 0; i < listaPersonagens.size(); i++){
+            Personagem personagem = listaPersonagens.get(i);
+            System.out.println("id: "+ personagem.getIdPersonagem());
+            System.out.println("nome: "+ personagem.getNome());
+            System.out.println("nivel: "+ personagem.getNivel());
+            System.out.println("_______________________");
+        }
+        System.out.println("Personagem Desafiado:");
+        System.out.println("Digite o id do personagem:");
+        id = scanner.nextInt();
+        Personagem personagem2 = personagemDAO.read(id);
+        Batalha batalha = new Batalha(personagem1, personagem2);
+
+        System.out.println("1. Batalha manual");
+        System.out.println("2. Batalha ate a morte");
+        System.out.println("0. Sair");
+        int op = scanner.nextInt();
+        switch(op){
+            case 1:
+                batalha.batalhaManual();
+                break;
+            case 2:
+                batalha.batalhaAteAMorte();
+                break;
+            case 0:
+                System.out.println("Saindo do menu de batalha...");
+                break;
+            default:
+                System.out.println("Opção inválida.");
+        }
+//todo refatorar o menu para reduzir duplicidade de metodos
+        //funcao de listagem de personagens
+    }
 }
 
+//o sistema deve possuir um menu de batalha onde o usuario pode escolher um personagem para batalhar
+//o sistema deve possuir um menu de personagens onde o usuario pode criar, editar, deletar e listar personagens
+//o sistema deve possuir um menu de contas onde o usuario pode criar, editar, deletar e listar contas
+//o sistema deve possuir um menu de racas onde o usuario pode criar, editar, deletar e listar racas
+//durante a batalha deve existir um sistema de turnos onde o usuario pode escolher a acao de cada personagem
+//o sistema deve possuir um sistema de randomizacao para as batalhas
+//o sistema deve possuir um sistema de login onde o usuario pode criar uma conta ou logar em uma existente
+//o sistema deve possuir um sistema de associacao entre personagens e contas
+//o sistema deve possuir um sistema de associacao entre personagens e racas
+//durante as batalhas devera existir uma thread separada que atualiza os atributos dos personagens a cada 0.5 segundos
 

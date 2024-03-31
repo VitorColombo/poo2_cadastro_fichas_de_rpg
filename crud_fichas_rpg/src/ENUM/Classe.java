@@ -28,4 +28,7 @@ public enum Classe {
         }
         throw new IllegalArgumentException("Classe nao encontrada.");
     }
+    public String getClasseNome(){
+        return name();
+    }
 }

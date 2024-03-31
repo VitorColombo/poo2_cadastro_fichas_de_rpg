@@ -49,7 +49,7 @@ public class ContaPersonagemDAO {
             ResultSet rs = ps.executeQuery();
 
             while(rs.next()){
-                Personagem personagem = new Personagem(rs.getInt(1), rs.getString(2), rs.getInt(3));
+                Personagem personagem = new Personagem(rs.getInt(1), rs.getString(2), rs.getInt(3), rs.getInt(4), rs.getInt(5));
                 personagens.add(personagem);
             }
         }catch(SQLException ex){

@@ -3,7 +3,6 @@ package Model;
 
 
 public class Conta {
-    
     private int idConta;
     private String login;
     private String senha;

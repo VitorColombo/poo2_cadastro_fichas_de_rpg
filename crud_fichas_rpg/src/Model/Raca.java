@@ -1,6 +1,8 @@
 
 package Model;
 
+import ENUM.Classe;
+
 public class Raca {
    private int idRaca;
    private String nome;
@@ -63,7 +65,8 @@ public class Raca {
     public void setClasse(int classe) {
         this.classe = classe;
     }
-   
-   
-   
+
+    public String getClasseNome(){
+        return Classe.fromInt(classe).getClasseNome();
+    }
 }

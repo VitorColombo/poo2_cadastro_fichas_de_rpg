@@ -12,7 +12,6 @@ import java.util.ArrayList;
 
 
 public class RacaDAO {
-    
      public int insert(Raca raca){ // inserir raca
         try{
             Connection conn = ConexaoMySQL.getConexaoMySQL();
