@@ -7,18 +7,21 @@ import java.awt.event.ActionListener;
 import DAO.ContaDAO;
 import Model.Conta;
 
-public class LoginGUI {
+public class RegistroGUI {
     private JFrame frame;
     private JTextField loginField;
     private JPasswordField passwordField;
-    private JButton loginButton;
     private JButton registerButton;
+    private JButton backButton;
     private ContaDAO contaDAO;
+    private LoginGUI loginGUI;
     private Conta usuarioLogado;
 
-    public LoginGUI() {
+
+    public RegistroGUI(LoginGUI loginGUI) {
+        this.loginGUI = loginGUI;
         contaDAO = new ContaDAO();
-        frame = new JFrame("Login");
+        frame = new JFrame("Cadastro");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(800, 500);
 
@@ -38,21 +41,19 @@ public class LoginGUI {
 
         loginField = new JTextField();
         loginField.setPreferredSize(new Dimension(200, 20));
-        loginField.setMinimumSize(new Dimension(100, 20));
         loginField.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                fazerLogin();
+                fazerCadastro();
             }
         });
 
         passwordField = new JPasswordField();
         passwordField.setPreferredSize(new Dimension(200, 20));
-        passwordField.setMinimumSize(new Dimension(100, 20));
         passwordField.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                fazerLogin();
+                fazerCadastro();
             }
         });
 
@@ -64,26 +65,25 @@ public class LoginGUI {
         gbc.gridy++;
         mainPanel.add(passwordField, gbc);
         gbc.gridy++;
-        loginButton = new JButton("Login");
-        loginButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                fazerLogin();
-            }
-        });
-        mainPanel.add(loginButton, gbc);
-
-        gbc.gridy++;
         registerButton = new JButton("Registrar");
         registerButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                RegistroGUI registroGUI = new RegistroGUI(LoginGUI.this);
-                registroGUI.show();
-                frame.setVisible(false);
+                fazerCadastro();
             }
         });
         mainPanel.add(registerButton, gbc);
+
+        gbc.gridy++;
+        backButton = new JButton("Voltar");
+        backButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                frame.setVisible(false);
+                loginGUI.show();
+            }
+        });
+        mainPanel.add(backButton, gbc);
 
         frame.add(mainPanel);
     }
@@ -93,28 +93,20 @@ public class LoginGUI {
         frame.setLocationRelativeTo(null);
     }
 
-    private void fazerLogin() {
+    private void fazerCadastro() {
         String login = loginField.getText();
         String senha = new String(passwordField.getPassword());
 
-        if (login.isEmpty() || senha.isEmpty()) {
-            JOptionPane.showMessageDialog(frame, "Todos os campos são obrigatórios");
-            return;
-        }
-        Conta conta = contaDAO.readLogin(login);
+        Conta conta = new Conta(login, senha);
 
-        if (conta != null) {
-            if (conta.getSenha().equals(senha)) {
-                usuarioLogado = conta;
-                JOptionPane.showMessageDialog(frame, "Bem vindo/a " + conta.getLogin() + "!");
-                MainMenuGUI mainMenuGUI = new MainMenuGUI(usuarioLogado);
-                mainMenuGUI.show();
-                frame.setVisible(false);
-            } else {
-                JOptionPane.showMessageDialog(frame, "Login inválido. Tente novamente");
-            }
+        if (contaDAO.insert(conta) > 0) {
+            usuarioLogado = conta;
+            JOptionPane.showMessageDialog(frame, "Bem vindo(a) ao sistema, " + login + "!");
+            MainMenuGUI mainMenuGUI = new MainMenuGUI(usuarioLogado);
+            mainMenuGUI.show();
+            frame.setVisible(false);
         } else {
-            JOptionPane.showMessageDialog(frame, "Usuário não cadastrado. Tente novamente");
+            JOptionPane.showMessageDialog(frame, "Erro! Nao foi possivel criar conta");
         }
     }
 }
